@@ -7,8 +7,7 @@ class vehicle():
 
     def onTime(self, step_now, new_route):
         #Distancia al punto origen
-        distToStart = abs( (self.pos[0] - new_route.start[0]) +
-                            (self.pos[1] - new_route.start[1]) )
+        distToStart = abs(self.pos[0] - new_route.start[0]) + abs(self.pos[1] - new_route.start[1])
         #Distancia total de hacer esa ruta
         total_steps = distToStart + new_route.manhattan()
         #Si el total de pasos es mayor que el step
