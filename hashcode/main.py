@@ -1,4 +1,6 @@
 import numpy as np
+import math
+import sys
 
 # 3 4 2 3 2 10
 # 0 0 1 3 2 9
@@ -14,14 +16,12 @@ def read_input(filename):
     with open(filename, 'r') as f:
         line = f.readline()
         rows, columns, vehicles, rides, bonus, steps = [int(val) for val in line.split()]
-        print line
 
         books = []
-        for row in range(rows):
-            for ing, col in zip(f.readline(), range(columns)):
-                data = ing.split(" ")
-                # books.append(car_deliveries([data[0],data[1]],[data[2],data[3]],data[4],data[5]));
-                print ing
+        for row in range(rows-1):
+            data = f.readline().split()
+            print(books)
+            books.append(car_deliveries([data[0],data[1]],[data[2],data[3]],data[4],data[5]));
 
 
     return rows, columns, vehicles, rides, bonus, steps, books
