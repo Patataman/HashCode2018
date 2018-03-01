@@ -1,36 +1,37 @@
 
 class vehicle():
 
-    def __init__(self, pos=[0,0], route=None):
+    def __init__(self, id,pos=[0,0], route=None):
+        self.id = id
         self.pos = pos
         self.route = route
         self.routesDone = []
-        self.moving = False
+        self.eta = -1
 
     def onTime(self, step_now, new_route):
         #Distancia al punto origen
         distToStart = abs(self.pos[0] - new_route.start_node[0]) + abs(self.pos[1] - new_route.start_node[1])
 
         #Si hay que esperar, pa fuera
-        #if distToStart + step_now < new_route.start_time:
-        #    return False
+        if distToStart + step_now < new_route.start_time:
+            return False
 
         #Distancia total de hacer esa ruta
         total_steps = distToStart + new_route.manhattan()
+        self.eta = total_steps + step_now
         #Si el total de pasos es mayor que el step
         #límite para obtener recompensa, pasamos de la ruta
         if total_steps+step_now > new_route.finish_time:
             return False
         else:
+            self.routesDone.append(new_route.id)
             return True
 
     def check(self, step_now):
-        if self.route.finish_time == step_now:
-            print("FINALIZADA RUTA: {} EN STEP {}".format(self.route.id, step_now))
+        if self.eta != -1 and self.eta >= step_now:
+            print("COCHE {} - FINALIZADA RUTA: {} EN STEP {}".format(self.id, self.route, step_now))
             self.pos = self.route.finish_node
-            self.routesDone.append(self.route.id)
             self.route = None
-            self.moving = False
             return True
         else:
             return False

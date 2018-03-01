@@ -24,61 +24,82 @@ def read_input(filename):
         print(rows)
         for row in range(rows):
             data = f.readline().split()
-            print(data)
-            books.append(route(row,[int(data[0]),int(data[1])],[int(data[2]),int(data[3])],int(data[4]),int(data[5])))
+            if len(data)>0:
+                books.append(route(row,[int(data[0]),int(data[1])],[int(data[2]),int(data[3])],int(data[4]),int(data[5])))
 
         #Lista de vehiculos disponibles
         vehicles = []
         for num in range(num_vehicles):
-            vehicles.append(vehicle())
+            vehicles.append(vehicle(num))
 
     return rows, columns, vehicles, rides, bonus, steps, books
 
-def getOutputFile(vehicles):
-    output = open("output.txt","w+")
+def getOutputFile(vehicles, file):
+    output = open("output_{}.txt".format(file.replace(".in","")),"w+")
     print(vehicles)
     for veh in vehicles:
         output.write("{}\n".format(veh))
     output.close()
 
+def orderVehicles(veh):
+    if veh.route is not None:
+        return 1
+    else:
+        return 0
+
+def orderRoutes(route):
+    if route.state != 0:
+        return 1
+    else:
+        return 0
+
+
 def main():
 
-    rows, columns, vehicles, rides, bonus, steps, books = read_input("a_example.in")
+    files = ["a_example.in", "b_should_be_easy.in", "c_no_hurry.in", "d_metropolis.in", "e_high_bonus.in"]
 
-    #Mientras puedas hacer rutas o tengas tiempos
-    surrender = False
-    current_step = 0
-    score = 0
+    for f in files:
+        rows, columns, vehicles, rides, bonus, steps, books = read_input(f)
 
-    print("COCHES:",vehicles)
-    print("RUTAS",books)
-    while (current_step < steps) and not surrender:
-        #Haces cosas
-        # 1 - Encuentras 1 ruta a hacer
-        for vehicle in vehicles:
-            #if vehicle.moving:
-            #    break
-            #Si el coche está libre
-            if vehicle.route is None:
-                for route in books:
-                    if route.state != 1:
-                        #Por cada ruta se mira si puede hacerla a tiempo
-                        #onTime(self, step_now, new_route):
-                        if vehicle.onTime(current_step, route):
-                            vehicle.route = route
-                            route.state = 1
+        #Mientras puedas hacer rutas o tengas tiempos
+        surrender = False
+        current_step = 0
+        score = 0
+
+        print("COCHES:",vehicles)
+        print("RUTAS",books)
+        while (current_step < steps) and not books[0].state == 1:
+            #Haces cosas
+            # 1 - Encuentras 1 ruta a hacer
+            vehicles.sort(key=orderVehicles)
+            for vehicle in vehicles:
+                if vehicle.route is not None:
+                    break
+                #Si el coche está libre
+                if vehicle.route is None:
+                    books.sort(key=orderRoutes)
+                    for route in books:
+                        if route.state != 0:
                             break
-                        else:
-                            print("No on time")
+                        if route.state != 1:
+                            #Por cada ruta se mira si puede hacerla a tiempo
+                            #onTime(self, step_now, new_route):
+                            if vehicle.onTime(current_step, route):
+                                print("COCHE {} COGE RUTA {}".format(vehicle.id, route))
+                                vehicle.route = route
+                                route.state = 1
+                                break
+                            #else:
+                                #print("No on time")
 
-        # 2 - Mover vehículos
-        for vehicle in vehicles:
-            if vehicle.route is not None:
-                vehicle.check(current_step)
+            # 2 - Mover vehículos
+            for vehicle in vehicles:
+                if vehicle.route is not None:
+                    vehicle.check(current_step)
 
-        current_step += 1
+            current_step += 1
 
-    getOutputFile(vehicles)
+        getOutputFile(vehicles, f)
 
 if __name__ == "__main__":
     main()
