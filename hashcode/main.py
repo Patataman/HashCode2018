@@ -21,23 +21,64 @@ def read_input(filename):
 
         #Rutas a realizar
         books = []
-        for row in range(rows-1):
+        print(rows)
+        for row in range(rows):
             data = f.readline().split()
-            print(type(data), data)
-            books.append(route([data[0],data[1]],[data[2],data[3]],data[4],data[5]))
+            print(data)
+            books.append(route(row,[int(data[0]),int(data[1])],[int(data[2]),int(data[3])],int(data[4]),int(data[5])))
 
         #Lista de vehiculos disponibles
         vehicles = []
         for num in range(num_vehicles):
             vehicles.append(vehicle())
 
-
     return rows, columns, vehicles, rides, bonus, steps, books
 
+def getOutputFile(vehicles):
+    output = open("output.txt","w+")
+    print(vehicles)
+    for veh in vehicles:
+        output.write("{}\n".format(veh))
+    output.close()
+
 def main():
-    print("starting")
+
     rows, columns, vehicles, rides, bonus, steps, books = read_input("a_example.in")
-    print("ehehhehe", books)
+
+    #Mientras puedas hacer rutas o tengas tiempos
+    surrender = False
+    current_step = 0
+    score = 0
+
+    print("COCHES:",vehicles)
+    print("RUTAS",books)
+    while (current_step < steps) and not surrender:
+        #Haces cosas
+        # 1 - Encuentras 1 ruta a hacer
+        for vehicle in vehicles:
+            #if vehicle.moving:
+            #    break
+            #Si el coche está libre
+            if vehicle.route is None:
+                for route in books:
+                    if route.state != 1:
+                        #Por cada ruta se mira si puede hacerla a tiempo
+                        #onTime(self, step_now, new_route):
+                        if vehicle.onTime(current_step, route):
+                            vehicle.route = route
+                            route.state = 1
+                            break
+                        else:
+                            print("No on time")
+
+        # 2 - Mover vehículos
+        for vehicle in vehicles:
+            if vehicle.route is not None:
+                vehicle.check(current_step)
+
+        current_step += 1
+
+    getOutputFile(vehicles)
 
 if __name__ == "__main__":
     main()
