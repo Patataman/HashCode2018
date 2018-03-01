@@ -36,6 +36,18 @@ class vehicle():
         else:
             return False
 
+    def getReward(self, current_step, route):
+        distToStart = abs(self.pos[0] - start_time.start_node[0]) + abs(self.pos[1] - start_time.start_node[1])
+        #Distancia total de hacer esa ruta
+        total_steps = distToStart + abs(current_step + distToStart - route.start_time) + start_time.manhattan()
+
+        return start_time.manhattan()/total_steps
+
+
+
+
+
+
     def __repr__(self):
         return "{} {}".format(len(self.routesDone), self.routesDone.__str__().replace("[", "").replace("]", "").replace(",",""))
 

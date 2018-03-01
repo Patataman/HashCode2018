@@ -78,19 +78,24 @@ def main():
                 #Si el coche está libre
                 if vehicle.route is None:
                     books.sort(key=orderRoutes)
+                    possibleRoute = None
+                    reward = 0
                     for route in books:
-                        if route.state != 0:
+                        if route.state == 0:
                             break
-                        if route.state != 1:
-                            #Por cada ruta se mira si puede hacerla a tiempo
-                            #onTime(self, step_now, new_route):
-                            if vehicle.onTime(current_step, route):
-                                print("COCHE {} COGE RUTA {}".format(vehicle.id, route))
-                                vehicle.route = route
-                                route.state = 1
-                                break
-                            #else:
-                                #print("No on time")
+                        #Por cada ruta se mira si puede hacerla a tiempo
+                        #onTime(self, step_now, new_route):
+                        if vehicle.onTime(current_step, route):
+                            aux_reward = vehicle.getReward(current_step, route)
+                            if aux_reward > reward:
+                                reward = aux_reward
+                                possibleRoute = route
+                        #else:
+                            #print("No on time")
+
+                    print("COCHE {} COGE RUTA {}".format(vehicle.id, route))
+                    vehicle.route = possibleRoute
+                    possibleRoute.state = 1
 
             # 2 - Mover vehículos
             for vehicle in vehicles:
