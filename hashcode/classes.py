@@ -19,10 +19,11 @@ class vehicle():
 
 
 class route():
-    def __init__(self,a,b,c,d,e,f):
-        self.start = [a,b]
-        self.end = [c,d]
-        self.start_step = e
-        self.last_step = f
+    def __init__(self, start_node, finish_node, start_time, finish_time):
+        self.start_node = start_node
+        self.finish_node = finish_node
+        self.start_time = start_time
+        self.finish_time = finish_time
+
     def manhattan(self):
-        return (abs(self.start[0]-self.end[0])+abs(self.start[1]-self.end[1))
+        return (abs(self.start_node[0]-self.finish_node[0])+abs(self.start_time[1]-self.finish_time[1]))
