@@ -21,7 +21,7 @@ class vehicle():
         self.eta = total_steps + step_now
         #Si el total de pasos es mayor que el step
         #límite para obtener recompensa, pasamos de la ruta
-        if total_steps+step_now > new_route.finish_time:
+        if total_steps+step_now >= new_route.finish_time:
             return False
         else:
             self.routesDone.append(new_route.id)
@@ -29,7 +29,7 @@ class vehicle():
 
     def check(self, step_now):
         if self.eta != -1 and self.eta >= step_now:
-            print("COCHE {} - FINALIZADA RUTA: {} EN STEP {}".format(self.id, self.route, step_now))
+            #print("COCHE {} - FINALIZADA RUTA: {} EN STEP {}".format(self.id, self.route, step_now))
             self.pos = self.route.finish_node
             self.route = None
             return True
@@ -37,16 +37,11 @@ class vehicle():
             return False
 
     def getReward(self, current_step, route):
-        distToStart = abs(self.pos[0] - start_time.start_node[0]) + abs(self.pos[1] - start_time.start_node[1])
+        distToStart = abs(self.pos[0] - route.start_node[0]) + abs(self.pos[1] - route.start_node[1])
         #Distancia total de hacer esa ruta
-        total_steps = distToStart + abs(current_step + distToStart - route.start_time) + start_time.manhattan()
+        total_steps = distToStart + abs(current_step + distToStart - route.start_time) + route.manhattan()
 
-        return start_time.manhattan()/total_steps
-
-
-
-
-
+        return route.manhattan()/total_steps
 
     def __repr__(self):
         return "{} {}".format(len(self.routesDone), self.routesDone.__str__().replace("[", "").replace("]", "").replace(",",""))

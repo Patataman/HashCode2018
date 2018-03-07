@@ -21,7 +21,6 @@ def read_input(filename):
 
         #Rutas a realizar
         books = []
-        print(rows)
         for row in range(rows):
             data = f.readline().split()
             if len(data)>0:
@@ -36,7 +35,6 @@ def read_input(filename):
 
 def getOutputFile(vehicles, file):
     output = open("output_{}.txt".format(file.replace(".in","")),"w+")
-    print(vehicles)
     for veh in vehicles:
         output.write("{}\n".format(veh))
     output.close()
@@ -48,17 +46,14 @@ def orderVehicles(veh):
         return 0
 
 def orderRoutes(route):
-    if route.state != 0:
-        return 1
-    else:
-        return 0
-
+    return route.start_time
 
 def main():
 
     files = ["a_example.in", "b_should_be_easy.in", "c_no_hurry.in", "d_metropolis.in", "e_high_bonus.in"]
 
-    for f in files:
+    for f in files[4:]:
+        print(f)
         rows, columns, vehicles, rides, bonus, steps, books = read_input(f)
 
         #Mientras puedas hacer rutas o tengas tiempos
@@ -66,36 +61,47 @@ def main():
         current_step = 0
         score = 0
 
-        print("COCHES:",vehicles)
-        print("RUTAS",books)
-        while (current_step < steps) and not books[0].state == 1:
+        #print("COCHES:",vehicles)
+        #print("RUTAS",books)
+        moments = []
+        books.sort(key=orderRoutes)
+        while (current_step < steps) and len(books) > 0: # and books[0].state == 0:
+            if current_step % 10000 == 0:
+                print("ESTOY EN {}".format(current_step))
             #Haces cosas
             # 1 - Encuentras 1 ruta a hacer
-            vehicles.sort(key=orderVehicles)
+            #vehicles.sort(key=orderVehicles)
             for vehicle in vehicles:
                 if vehicle.route is not None:
-                    break
+                    continue
                 #Si el coche está libre
                 if vehicle.route is None:
-                    books.sort(key=orderRoutes)
-                    possibleRoute = None
-                    reward = 0
-                    for route in books:
-                        if route.state == 0:
-                            break
+                    for i in range(len(books)):
                         #Por cada ruta se mira si puede hacerla a tiempo
                         #onTime(self, step_now, new_route):
-                        if vehicle.onTime(current_step, route):
-                            aux_reward = vehicle.getReward(current_step, route)
-                            if aux_reward > reward:
-                                reward = aux_reward
-                                possibleRoute = route
+                        if books[i].state == 0 and vehicle.onTime(current_step, books[i]):
+                            moments.append(books[i].finish_time)
+                            vehicle.route = books[i]
+                            books[i].state = 1
+                            books.pop(i)
+                            break
+                            #aux_reward = vehicle.getReward(current_step, route)
+                            #if aux_reward > reward:
+                            #    reward = aux_reward
+                            #    possibleRoute = route
                         #else:
                             #print("No on time")
+                    #print("COCHE {} COGE RUTA {}".format(vehicle.id, route))
+                    #if possibleRoute is not None:
+                    #    vehicle.route = possibleRoute
+                    #    possibleRoute.state = 1
 
-                    print("COCHE {} COGE RUTA {}".format(vehicle.id, route))
-                    vehicle.route = possibleRoute
-                    possibleRoute.state = 1
+            #books.sort(key=orderRoutes)
+            if len(moments) > 0:
+                moments.sort()
+                print("FROM CURRENT {}".format(current_step))
+                current_step = moments.pop(0)
+                print("TO CURRENT {}".format(current_step))
 
             # 2 - Mover vehículos
             for vehicle in vehicles:
